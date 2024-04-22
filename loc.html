@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Coordinates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .personal-details {
+            background-color: #4CAF50; /* Dark orange */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+        }
+
+        .personal-details p {
+            margin: 5px 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 40px 30px; /* Increased padding for height */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4CAF50; /* Dark orange */
+            margin-bottom: 20px;
+            font-size: 32px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        p {
+            color: #333; /* Dark grey */
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        button {
+            background-color: #4CAF50; /* Dark orange */
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        button:hover {
+            background-color: #2fe617; /* Lighter orange */
+        }
+
+        #locationInfo {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333; /* Dark grey */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .chartFrame {
+            display: none; /* Hide the chart initially */
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%; /* Make the chart frame responsive */
+            height: 280px; /* Increase the height of the iframe */
+        }
+
+        .credits {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666; /* Grey */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 30px; /* Decrease padding for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="personal-details">
+        <p style="font-weight: bold;">VISHAL KUMAR S</p>
+        <p>21ITR118</p>
+        <p>CLOUD COMPUTING LAB EXERCISE 09</p>
+        <p>KONGU ENGINEERING COLLEGE , PERUNDURAI-638060</p>
+    </div>
+    <div class="container">
+        <h1>Find Your Coordinates</h1>
+        <p>Click the button below to find your coordinates.</p>
+        <button id="sendLocationBtn">Find Coordinates</button>
+        <div id="locationInfo"></div>
+        <!-- Embedding first chart URL in an iframe -->
+        <iframe class="chartFrame" src="https://thingspeak.com/channels/2517675/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15" frameborder="0"></iframe>
+        <!-- Embedding second chart URL in an iframe -->
+        <iframe class="chartFrame" src="https://thingspeak.com/channels/2517675/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15" frameborder="0"></iframe>
+    </div>
+
+    <script>
+        document.getElementById("sendLocationBtn").addEventListener("click", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendToThingSpeak);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        });
+
+        function sendToThingSpeak(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            document.getElementById("locationInfo").innerHTML = "Your Latitude: " + latitude + "<br>Your Longitude: " + longitude;
+
+            // Animate latitude and longitude
+            animateLocation(latitude, longitude);
+
+            // Display the charts after a delay
+            setTimeout(function() {
+                var chartFrames = document.getElementsByClassName("chartFrame");
+                for (var i = 0; i < chartFrames.length; i++) {
+                    chartFrames[i].style.display = "block";
+                }
+            }, 5000); // 5000 milliseconds = 5 seconds
+        }
+
+        function animateLocation(latitude, longitude) {
+            // Example animation, you can replace this with your desired animation
+            var animationDuration = 3000; // 3 seconds
+            var startTime = Date.now();
+
+            function animate() {
+                var currentTime = Date.now();
+                var elapsedTime = currentTime - startTime;
+
+                if (elapsedTime < animationDuration) {
+                    var percentageComplete = elapsedTime / animationDuration;
+                    var animatedLatitude = latitude + (Math.sin(percentageComplete * Math.PI) * 0.1);
+                    var animatedLongitude = longitude + (Math.cos(percentageComplete * Math.PI) * 0.1);
+
+                    document.getElementById("locationInfo").innerHTML = "<br>Your Latitude: " + animatedLatitude.toFixed(6) + "<br>Your Longitude: " + animatedLongitude.toFixed(6);
+
+                    requestAnimationFrame(animate);
+                } else {
+                    document.getElementById("locationInfo").innerHTML = "Your Latitude: " + latitude + "<br>Your Longitude: " + longitude;
+                }
+            }
+
+            animate();
+        }
+    </script>
+</body>
+</html>
